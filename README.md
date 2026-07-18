@@ -2,7 +2,7 @@
 
 A production-quality prototype of an AI-powered UI/UX design platform. DesignMate gives designers, developers, and product teams three focused AI agents — **Generate**, **Review**, and **Improve** — in a single, premium SaaS-style workspace.
 
-The three agents are powered by the **Google Gemini API** through the official `@google/genai` SDK. All model calls run server-side in Next.js route handlers, so your API key stays on the server and is never exposed to the browser. There is no database, no auth, and no user accounts — just add a Gemini API key and run.
+The three agents are powered by **Gemini via [OpenRouter](https://openrouter.ai/)** (OpenAI-compatible API). All model calls run server-side in Next.js route handlers, so your API key stays on the server and is never exposed to the browser. There is no database, no auth, and no user accounts — just add an OpenRouter API key and run.
 
 ## Features
 
@@ -19,7 +19,7 @@ The three agents are powered by the **Google Gemini API** through the official `
 ## Tech Stack
 
 - [Next.js 14](https://nextjs.org/) (App Router) + [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
-- [Google Gemini API](https://ai.google.dev/) via the official [`@google/genai`](https://www.npmjs.com/package/@google/genai) SDK
+- [OpenRouter](https://openrouter.ai/) serving Google's Gemini models over an OpenAI-compatible API (no SDK; plain `fetch`)
 - [Tailwind CSS](https://tailwindcss.com/) with a custom design token system (CSS variables for light/dark theming)
 - [next-themes](https://github.com/pacocoursey/next-themes) for theme persistence
 - [Framer Motion](https://www.framer.com/motion/) for animation
@@ -27,7 +27,7 @@ The three agents are powered by the **Google Gemini API** through the official `
 
 ## Getting Started
 
-**Requirements:** Node.js 18.17 or later, and a Google Gemini API key ([get one free](https://aistudio.google.com/app/apikey)).
+**Requirements:** Node.js 18.17 or later, and an OpenRouter API key ([get one](https://openrouter.ai/keys)).
 
 ```bash
 # 1. Install dependencies
@@ -36,7 +36,7 @@ npm install
 # 2. Configure your API key
 #    Copy the example env file, then edit .env.local and paste your key.
 cp .env.example .env.local
-#    Set GEMINI_API_KEY=your_real_key in .env.local
+#    Set OPENROUTER_API_KEY=your_real_key in .env.local
 
 # 3. Run the development server
 npm run dev
@@ -49,8 +49,8 @@ npm run dev
 
 | Variable         | Required | Description                                               |
 | ---------------- | -------- | --------------------------------------------------------- |
-| `GEMINI_API_KEY` | Yes      | Your Google Gemini API key. Read server-side only.        |
-| `GEMINI_MODEL`   | No       | Model override for all three agents (default `gemini-2.5-flash`). |
+| `OPENROUTER_API_KEY` | Yes  | Your OpenRouter API key. Read server-side only.           |
+| `OPENROUTER_MODEL`   | No   | Model override for all agents (default `google/gemini-2.5-flash`). |
 
 `.env.local` is git-ignored — never commit a real key. The build succeeds without a key; the app only needs it at runtime, and shows a clear in-app error if it's missing.
 
@@ -76,7 +76,7 @@ The flow for every agent is **Input → Clarify (if needed) → Analysis → Res
 
 ### Swapping the model
 
-All three agents share `GEMINI_MODEL` (default `gemini-2.5-flash`). Set it in `.env.local` to use a different Gemini model without any code changes.
+All agents share `OPENROUTER_MODEL` (default `google/gemini-2.5-flash`). Set it in `.env.local` to use a different model without any code changes.
 
 ## Project Structure
 
@@ -111,7 +111,7 @@ lib/
     improver.ts               Design Improver system prompt
     shapes.ts                 Shared JSON-shape descriptions embedded into the prompts
   gemini/
-    client.ts                 Server-only Gemini client (reads GEMINI_API_KEY / GEMINI_MODEL from env)
+    client.ts                 Server-only provider config (reads OPENROUTER_API_KEY / OPENROUTER_MODEL from env)
     core.ts                   Shared structured-JSON call helper + image/text part builders
     coerce.ts                 Coerces raw model JSON into the exact typed shapes the UI renders
     generate.ts / review.ts / improve.ts   Per-agent call modules
@@ -121,5 +121,5 @@ lib/
 ## Design Notes
 
 - No authentication, database, payments, history, or user accounts — by design, this is a focused prototype.
-- The only external dependency is the Google Gemini API. The API key is read exclusively server-side (`lib/gemini/client.ts` is marked `server-only`) and never shipped to the browser.
+- The only external dependency is the OpenRouter API. The API key is read exclusively server-side (`lib/gemini/client.ts` is marked `server-only`) and never shipped to the browser.
 - Color system, spacing, and typography are defined once in `app/globals.css` and `tailwind.config.ts` and reused everywhere via Tailwind utility classes and CSS variables, so switching the brand palette is a one-file change.

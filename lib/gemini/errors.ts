@@ -28,13 +28,13 @@ export function toErrorResponse(error: unknown, context?: string): NextResponse 
   // Surface common upstream auth/quota problems in a readable way.
   if (/api key|permission|unauthenticated|invalid/i.test(message)) {
     return NextResponse.json(
-      { error: "The Gemini API rejected the request. Check that GEMINI_API_KEY is valid." },
+      { error: "The AI provider rejected the request. Check that OPENROUTER_API_KEY is valid." },
       { status: 502 }
     );
   }
   if (/quota|rate|resource exhausted|429/i.test(message)) {
     return NextResponse.json(
-      { error: "The Gemini API rate limit or quota was reached. Please wait and try again." },
+      { error: "The AI provider rate limit or quota was reached. Please wait and try again." },
       { status: 429 }
     );
   }
@@ -45,7 +45,7 @@ export function toErrorResponse(error: unknown, context?: string): NextResponse 
   );
 }
 
-/** Pulls the upstream HTTP status code out of a @google/genai ApiError, whether
+/** Pulls the upstream HTTP status code out of an upstream API error, whether
  *  it's exposed as a numeric `.status` or embedded in the JSON message. */
 function extractUpstream(error: unknown): { httpStatus?: number; status?: string } {
   const result: { httpStatus?: number; status?: string } = {};

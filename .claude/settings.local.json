@@ -6,7 +6,10 @@
       "Bash(npm install *)",
       "Bash(npm run *)",
       "Bash(powershell -Command \"Stop-Process -Id 23864 -Force\")",
-      "Bash(powershell -Command \"Stop-Process -Id 6392 -Force\")"
+      "Bash(powershell -Command \"Stop-Process -Id 6392 -Force\")",
+      "Bash(curl -s --max-time 30 \"https://openrouter.ai/api/v1/models\")",
+      "Bash(npm uninstall *)",
+      "Bash(python -)"
     ]
   }
 }

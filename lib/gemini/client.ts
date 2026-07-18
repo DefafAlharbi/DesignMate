@@ -1,5 +1,4 @@
 import "server-only";
-import { GoogleGenAI } from "@google/genai";
 
 /** Thrown when the API key is missing so routes can return a clear 500. */
 export class GeminiConfigError extends Error {
@@ -9,25 +8,27 @@ export class GeminiConfigError extends Error {
   }
 }
 
-/** Default model used by all three agents; override with GEMINI_MODEL. */
-export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
-
-let cached: GoogleGenAI | null = null;
+/** OpenRouter's OpenAI-compatible chat completions endpoint. */
+export const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 /**
- * Returns a singleton Gemini client. The API key is read from the environment
- * only — it is never hardcoded and never sent to the browser (this module is
- * server-only).
+ * Default model used by all agents, served through OpenRouter. This is the same
+ * Gemini model as before, just routed via OpenRouter. Override with
+ * OPENROUTER_MODEL (must be a valid OpenRouter model slug).
  */
-export function getGeminiClient(): GoogleGenAI {
-  const apiKey = process.env.GEMINI_API_KEY;
+export const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash";
+
+/**
+ * Reads the OpenRouter credentials from the environment. The key is read from
+ * the environment only — it is never hardcoded and never sent to the browser
+ * (this module is server-only).
+ */
+export function getOpenRouterConfig(): { apiKey: string; model: string } {
+  const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey || apiKey === "YOUR_API_KEY_HERE") {
     throw new GeminiConfigError(
-      "GEMINI_API_KEY is not configured. Add a valid key to .env.local and restart the dev server."
+      "OPENROUTER_API_KEY is not configured. Add a valid key to .env.local and restart the dev server."
     );
   }
-  if (!cached) {
-    cached = new GoogleGenAI({ apiKey });
-  }
-  return cached;
+  return { apiKey, model: OPENROUTER_MODEL };
 }
